@@ -16,3 +16,5 @@ x0x08048a07 in plat (sockfd=3) at client.c:83
 avec print(IAPlay) sur GDB :
 
 $1 = {row = 1937076054, column = 1702256928}
+
+OR normalement avec ma structure findPos, j'utilise des % et / pour éviter cela...
