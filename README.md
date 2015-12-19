@@ -1,20 +1,6 @@
 # server-client
 
-GDB dit:
+#Problèmes restants :
+- Parfois l'IA ne joue pas (ou joue le coup à un endroit qu'il a déjà joué)
 
-avec bt:
-
-#0 0x08048a07 in play()
-#1 0x08048848 in askPlay()
-#2 0x08048bac in main()
-
-avec -g:
-
-x0x08048a07 in plat (sockfd=3) at client.c:83
-83                            board[IAPlay.row][AIPlay.column] = 'X';
-
-avec print(IAPlay) sur GDB :
-
-$1 = {row = 1937076054, column = 1702256928}
-
-OR normalement avec ma structure findPos, j'utilise des % et / pour éviter cela...
+- ça se termine avec send: connection reset py peer lorsque l'on gagne ou perd sans demandé si l'on veut rejouer.
