@@ -31,7 +31,7 @@ void startGame(int new_fd)
     int counter = 0; // game counter, if this goes to 9 and no winner, draw
     int notEnd = 1;
     const char askChoice[] = "Où voulez vous jouer votre coup ?\n";
-    char pos;
+    int pos;
     struct position position;
     
     while (notEnd)
@@ -43,16 +43,19 @@ void startGame(int new_fd)
             if (recv(new_fd, &pos, 1, 0) == -1)
                 perror("recv");
         }while (pos>9 || pos<0);
-        printf("cc cv?");
         position = findPos(pos);
         board[position.row][position.column] = 'O';
         if (isFinish(board))
+        {
             notEnd = 0;
             win(new_fd);
+        }
         IA(board, new_fd);
         if (isFinish(board))
+        {
             notEnd = 0;
             loss(new_fd);
+        }
         if (counter == 8)
             draw(new_fd);
         ++counter;
