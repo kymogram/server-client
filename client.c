@@ -1,7 +1,3 @@
-/*
-** client.c -- a stream socket client demo
-*/
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -78,18 +74,24 @@ void play(int sockfd)
             notEnd = 0;
             win(sockfd);
         }
-        if (recv(sockfd, &IAPlay, sizeof(IAPlay), 0) == -1)
-            perror("recv");
-        board[IAPlay.row][IAPlay.column] = 'X';
-        displayBoard(board);
-        if (isFinish(board))
+        else
         {
-            notEnd = 0;
-            loss(sockfd);
+            if (recv(sockfd, &IAPlay, sizeof(IAPlay), 0) == -1)
+                perror("recv");
+            board[IAPlay.row][IAPlay.column] = 'X';
+            displayBoard(board);
+            if (isFinish(board))
+            {
+                notEnd = 0;
+                loss(sockfd);
+            }
+            else
+            {
+                if (counter == 8)
+                    draw(sockfd);
+                ++counter;
+            }
         }
-        if (counter == 8)
-            draw(sockfd);
-        ++counter;
     }
 }
 
@@ -131,4 +133,3 @@ int main(int argc, char *argv[])
 
     return 0;
 }
-

@@ -1,7 +1,3 @@
-/*
-** server.c -- a stream socket server demo
-*/
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -40,35 +36,41 @@ void startGame(int new_fd)
         {
             if (send(new_fd, askChoice, sizeof(askChoice), 0) == -1)
                 perror("send");
-            if (recv(new_fd, &pos, 1, 0) == -1)
+            if (recv(new_fd, &pos, sizeof(int), 0) == -1)
                 perror("recv");
         }while (pos>9 || pos<0);
         position = findPos(pos);
         board[position.row][position.column] = 'O';
         if (isFinish(board))
         {
-            notEnd = 0;
             win(new_fd);
-        }
-        IA(board, new_fd);
-        if (isFinish(board))
-        {
             notEnd = 0;
-            loss(new_fd);
         }
-        if (counter == 8)
-            draw(new_fd);
-        ++counter;
+        else
+        {
+            IA(board, new_fd);
+            if (isFinish(board))
+            {
+                loss(new_fd);
+                notEnd = 0;
+            }
+            else
+            {
+                if (counter == 8)
+                    draw(new_fd);
+            }
+            ++counter;
+        }
     }
 }
 
 void IA(char board[3][3], int new_fd)
 {
     struct position position;
+    int pos;
     do
     {
-        srand(time(NULL));
-        int pos = rand()%10;
+        pos = rand()%10;
         position = findPos(pos);
     }while (board[position.row][position.column] == 'X' || board[position.row][position.column] == 'O');
     board[position.row][position.column] = 'X';
@@ -148,6 +150,7 @@ int main(void)
             perror("accept");
             continue;
         }
+        srand(time(NULL));
         // new player
         if (!fork()) { // this is the child process
             close(sockfd); // child doesn't need the listener
