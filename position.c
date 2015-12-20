@@ -26,3 +26,8 @@ int isFinish(char board[3][3])
                return 1;
     return 0;
 }
+
+int checkIfUsed(char board[3][3], struct position position)
+{
+    return ((board[position.row][position.column] == 'X') || (board[position.row][position.column] == 'O'));
+}

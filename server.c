@@ -32,27 +32,27 @@ void startGame(int new_fd)
     
     while (notEnd)
     {
-        do
-        {
-            if (send(new_fd, askChoice, sizeof(askChoice), 0) == -1)
-                perror("send");
-            if (recv(new_fd, &pos, sizeof(int), 0) == -1)
-                perror("recv");
-        }while (pos>9 || pos<0);
-        position = findPos(pos);
-        board[position.row][position.column] = 'O';
+        IA(board, new_fd);
         if (isFinish(board))
         {
-            win(new_fd);
+            loss(new_fd);
             notEnd = 0;
             askPlay(new_fd);
         }
         else
         {
-            IA(board, new_fd);
+            do
+            {
+                if (send(new_fd, askChoice, sizeof(askChoice), 0) == -1)
+                    perror("send");
+                if (recv(new_fd, &pos, sizeof(int), 0) == -1)
+                    perror("recv");
+                position = findPos(pos);
+            }while ((pos>9 || pos<0) && checkIfUsed(board, position));
+            board[position.row][position.column] = 'X';
             if (isFinish(board))
             {
-                loss(new_fd);
+                win(new_fd);
                 notEnd = 0;
                 askPlay(new_fd);
             }
@@ -99,8 +99,8 @@ void IA(char board[3][3], int new_fd)
     {
         pos = rand()%10;
         position = findPos(pos);
-    }while (board[position.row][position.column] == 'X' || board[position.row][position.column] == 'O');
-    board[position.row][position.column] = 'X';
+    }while (checkIfUsed(board, position));
+    board[position.row][position.column] = 'O';
     if (send(new_fd, &position, sizeof(position), 0) == -1)
         perror("send");
 }

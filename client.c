@@ -60,38 +60,38 @@ void play(int sockfd)
     displayBoard(board);
     while (notEnd)
     {
-        do
-        {
-            if (recv(sockfd, question, 100, 0) == -1)
+        if (recv(sockfd, &IAPlay, sizeof(IAPlay), 0) == -1)
                 perror("recv");
-            printf("%s", question);
-            scanf("%d", &answer);
-        }while (answer>9 || answer<0);
-        position = findPos(answer);
-        board[position.row][position.column] = 'O';
+        board[IAPlay.row][IAPlay.column] = 'O';
         displayBoard(board);
-        if (send(sockfd, &answer, sizeof(int), 0) == -1)
-            perror("send");
         if (isFinish(board))
         {
             notEnd = 0;
-            if (recv(sockfd, winSentence, 100, 0) == -1)
+            if (recv(sockfd, lossSentence, 100, 0) == -1)
                 perror("recv");
-            printf("%s", winSentence);
+            printf("%s", lossSentence);
             answerPlay(sockfd);
         }
         else
         {
-            if (recv(sockfd, &IAPlay, sizeof(IAPlay), 0) == -1)
-                perror("recv");
-            board[IAPlay.row][IAPlay.column] = 'X';
+            do
+            {
+                if (recv(sockfd, question, 100, 0) == -1)
+                    perror("recv");
+                printf("%s", question);
+                scanf("%d", &answer);
+                position = findPos(answer);
+            }while ((answer>9 || answer<0) && checkIfUsed(board, position));
+            board[position.row][position.column] = 'X';
             displayBoard(board);
+            if (send(sockfd, &answer, sizeof(int), 0) == -1)
+                perror("send");
             if (isFinish(board))
             {
                 notEnd = 0;
-                if (recv(sockfd, lossSentence, 100, 0) == -1)
+                if (recv(sockfd, winSentence, 100, 0) == -1)
                     perror("recv");
-                printf("%s", lossSentence);
+                printf("%s", winSentence);
                 answerPlay(sockfd);
             }
             else
