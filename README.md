@@ -1,8 +1,5 @@
 # server-client
 
 #Problèmes restants :
-- Parfois l'IA ne joue pas (ou joue le coup à un endroit qu'il a déjà joué)
 
-- ça se termine sans demandé si l'on veut rejouer.
-
-- Mon checkIfUsed qui test si la case est déjà utilisé ne fonctionne pas
+- lors du test si le client rentre 1 ou 2 s'il veut jouer, mon printf de la question et du "soyez raisonnable" apparaissent deux fois or je n'ai fais qu'un appel à la fonction
