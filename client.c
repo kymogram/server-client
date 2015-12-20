@@ -22,7 +22,7 @@ void displayBoard(char board[3][3])
     printf(" %c | %c | %c\n", board[2][0], board[2][1], board[2][2]);
 }
 
-void askPlay(int sockfd)
+void answerPlay(int sockfd)
 {
     char question[100];
     char answer;
@@ -50,6 +50,9 @@ void play(int sockfd)
     struct position position;
     int notEnd = 1;
     char question[100];
+    char winSentence[100];
+    char lossSentence[100];
+    char drawSentence[100];
     int answer;
     int counter = 0;
     struct position IAPlay;
@@ -72,7 +75,10 @@ void play(int sockfd)
         if (isFinish(board))
         {
             notEnd = 0;
-            win(sockfd);
+            if (recv(sockfd, winSentence, 100, 0) == -1)
+                perror("recv");
+            printf("%s", winSentence);
+            answerPlay(sockfd);
         }
         else
         {
@@ -83,12 +89,20 @@ void play(int sockfd)
             if (isFinish(board))
             {
                 notEnd = 0;
-                loss(sockfd);
+                if (recv(sockfd, lossSentence, 100, 0) == -1)
+                    perror("recv");
+                printf("%s", lossSentence);
+                answerPlay(sockfd);
             }
             else
             {
                 if (counter == 8)
-                    draw(sockfd);
+                {
+                    if (recv(sockfd, drawSentence, 100, 0) == -1)
+                        perror("recv");
+                    printf("%s", drawSentence);
+                    answerPlay(sockfd);
+                }
                 ++counter;
             }
         }
@@ -128,7 +142,7 @@ int main(int argc, char *argv[])
         perror("connect");
         exit(1);
     }
-    askPlay(sockfd);
+    answerPlay(sockfd);
     close(sockfd);
 
     return 0;

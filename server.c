@@ -45,6 +45,7 @@ void startGame(int new_fd)
         {
             win(new_fd);
             notEnd = 0;
+            askPlay(new_fd);
         }
         else
         {
@@ -53,15 +54,41 @@ void startGame(int new_fd)
             {
                 loss(new_fd);
                 notEnd = 0;
+                askPlay(new_fd);
             }
             else
             {
                 if (counter == 8)
+                {
                     draw(new_fd);
+                    notEnd = 0;
+                    askPlay(new_fd);
+                }
             }
             ++counter;
         }
     }
+}
+
+void draw(int new_fd)
+{
+    const char drawGame[] = "Match nul!\n";
+    if (send(new_fd, drawGame, sizeof(drawGame), 0) == -1)
+        perror("send");
+}
+
+void win(int new_fd)
+{
+    const char winGame[] = "Vous avez gagné!\n";
+    if (send(new_fd, winGame, sizeof(winGame), 0) == -1)
+        perror("send");
+}
+
+void loss(int new_fd)
+{
+    const char lossGame[] = "Vous avez perdu!\n";
+    if (send(new_fd, lossGame, sizeof(lossGame), 0) == -1)
+        perror("send");
 }
 
 void IA(char board[3][3], int new_fd)
