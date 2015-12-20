@@ -30,22 +30,17 @@ void answerPlay(int sockfd)
     {
         perror("recv");
     }
-    printf("%s", question);
-    scanf("%c", &answer);
+    do
+    {
+        printf("%s", question);
+        scanf("%c", &answer);
+    }while ((answer != '1') && (answer != '2'));
     if ((send(sockfd, &answer, 1, 0)) == -1)
     {
         perror("send");
     }
     if (answer == '1')
         play(sockfd);
-    else
-    {
-        if (answer != '2')
-        {
-            printf("\nSoyez raisonnable..\n");
-            answerPlay(sockfd);
-        }
-    }
 }
 
 void play(int sockfd)

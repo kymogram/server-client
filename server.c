@@ -112,9 +112,6 @@ void askPlay(int new_fd)
         perror("recv");
     if (answer == '1')
         startGame(new_fd);
-    else
-        if (answer != '2')
-            askPlay(new_fd);
 }
 
 void sigchld_handler(int s)
