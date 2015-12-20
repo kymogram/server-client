@@ -24,7 +24,7 @@ void startGame(int new_fd)
                         {'4', '5', '6'},
                         {'7', '8', '9'}
                        };
-    int counter = 0; // game counter, if this goes to 9 and no winner, draw
+    int counter = 0; // game counter, if this goes to 8 and no winner, draw
     int notEnd = 1;
     const char askChoice[] = "Où voulez vous jouer votre coup ?\n";
     int pos;
@@ -37,7 +37,6 @@ void startGame(int new_fd)
         {
             loss(new_fd);
             notEnd = 0;
-            askPlay(new_fd);
         }
         else
         {
@@ -54,7 +53,6 @@ void startGame(int new_fd)
             {
                 win(new_fd);
                 notEnd = 0;
-                askPlay(new_fd);
             }
             else
             {
@@ -62,11 +60,10 @@ void startGame(int new_fd)
                 {
                     draw(new_fd);
                     notEnd = 0;
-                    askPlay(new_fd);
                 }
             }
-            ++counter;
         }
+        ++counter;
     }
 }
 
@@ -99,7 +96,7 @@ void IA(char board[3][3], int new_fd)
     {
         pos = rand()%10;
         position = findPos(pos);
-    }while (checkIfUsed(board, position));
+    }while ((checkIfUsed(board, position)) || (pos == 0));
     board[position.row][position.column] = 'O';
     if (send(new_fd, &position, sizeof(position), 0) == -1)
         perror("send");
@@ -115,6 +112,9 @@ void askPlay(int new_fd)
         perror("recv");
     if (answer == '1')
         startGame(new_fd);
+    else
+        if (answer != '2')
+            askPlay(new_fd);
 }
 
 void sigchld_handler(int s)

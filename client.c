@@ -38,6 +38,14 @@ void answerPlay(int sockfd)
     }
     if (answer == '1')
         play(sockfd);
+    else
+    {
+        if (answer != '2')
+        {
+            printf("\nSoyez raisonnable..\n");
+            answerPlay(sockfd);
+        }
+    }
 }
 
 void play(int sockfd)
@@ -70,7 +78,6 @@ void play(int sockfd)
             if (recv(sockfd, lossSentence, 100, 0) == -1)
                 perror("recv");
             printf("%s", lossSentence);
-            answerPlay(sockfd);
         }
         else
         {
@@ -92,7 +99,6 @@ void play(int sockfd)
                 if (recv(sockfd, winSentence, 100, 0) == -1)
                     perror("recv");
                 printf("%s", winSentence);
-                answerPlay(sockfd);
             }
             else
             {
@@ -101,11 +107,10 @@ void play(int sockfd)
                     if (recv(sockfd, drawSentence, 100, 0) == -1)
                         perror("recv");
                     printf("%s", drawSentence);
-                    answerPlay(sockfd);
                 }
-                ++counter;
             }
         }
+        ++counter;
     }
 }
 
