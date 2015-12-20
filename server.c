@@ -15,7 +15,7 @@
 
 #define MYPORT 3490    // the port users will be connecting to
 
-#define BACKLOG 10     // how many pending connections queue will hold
+#define BACKLOG 10     // how many pending comnnections queue will hold
 
 void startGame(int new_fd)
 {
@@ -32,7 +32,9 @@ void startGame(int new_fd)
     
     while (notEnd)
     {
+        // IA start first
         IA(board, new_fd);
+        // check if the IA won (otherwise client loose)
         if (isFinish(board))
         {
             loss(new_fd);
@@ -42,12 +44,15 @@ void startGame(int new_fd)
         {
             do
             {
+                // ask client to play and receive its response
                 if (send(new_fd, askChoice, sizeof(askChoice), 0) == -1)
                     perror("send");
                 if (recv(new_fd, &pos, sizeof(int), 0) == -1)
                     perror("recv");
+                // convert the position receive for the board
                 position = findPos(pos);
-            }while ((pos>9 || pos<0) && checkIfUsed(board, position));
+            // has to be in the board and not already used
+            }while ((pos>9 || pos<0) || checkIfUsed(board, position));
             board[position.row][position.column] = 'X';
             if (isFinish(board))
             {
@@ -56,6 +61,7 @@ void startGame(int new_fd)
             }
             else
             {
+                // if counter is 8, every square is taken -> draw
                 if (counter == 8)
                 {
                     draw(new_fd);
@@ -94,9 +100,11 @@ void IA(char board[3][3], int new_fd)
     int pos;
     do
     {
-        pos = rand()%10;
+        // take random number between 1 and 9
+        pos = rand()%9 + 1;
+        // convert it for the board
         position = findPos(pos);
-    }while ((checkIfUsed(board, position)) || (pos == 0));
+    }while (checkIfUsed(board, position));
     board[position.row][position.column] = 'O';
     if (send(new_fd, &position, sizeof(position), 0) == -1)
         perror("send");
@@ -174,6 +182,7 @@ int main(void)
             perror("accept");
             continue;
         }
+        // srand is used for the IA when it makes random number. It's a better way to get random number
         srand(time(NULL));
         // new player
         if (!fork()) { // this is the child process

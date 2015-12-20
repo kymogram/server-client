@@ -10,7 +10,7 @@
 #include "position.h"
 #include "client.h"
 
-#define PORT 3490 // the port client will be connecting to 
+#define PORT 3490 // the port client will be connecting to
 
 void displayBoard(char board[3][3])
 {
@@ -26,6 +26,7 @@ void answerPlay(int sockfd)
 {
     char question[100];
     char answer;
+    // receive the question -> ask if the client wants to play
     if ((recv(sockfd, question, 100, 0)) == -1)
     {
         perror("recv");
@@ -34,6 +35,7 @@ void answerPlay(int sockfd)
     {
         printf("%s", question);
         scanf("%c", &answer);
+    // the client has to respect the question who only ask to enter '1' or '2'
     }while ((answer != '1') && (answer != '2'));
     if ((send(sockfd, &answer, 1, 0)) == -1)
     {
@@ -60,12 +62,15 @@ void play(int sockfd)
     int counter = 0;
     struct position IAPlay;
 
+    // first display the board to show to the client what does it look like
     displayBoard(board);
     while (notEnd)
     {
+        // receive what the IA played (first to play)
         if (recv(sockfd, &IAPlay, sizeof(IAPlay), 0) == -1)
                 perror("recv");
         board[IAPlay.row][IAPlay.column] = 'O';
+        // show the result and check if the IA won (otherwise the client loose)
         displayBoard(board);
         if (isFinish(board))
         {
@@ -78,14 +83,16 @@ void play(int sockfd)
         {
             do
             {
+                // the client has to play and send a correct number between 1 and 9, not already used
                 if (recv(sockfd, question, 100, 0) == -1)
                     perror("recv");
                 printf("%s", question);
                 scanf("%d", &answer);
                 position = findPos(answer);
-            }while ((answer>9 || answer<0) && checkIfUsed(board, position));
+            }while ((answer>9 || answer<0) || checkIfUsed(board, position));
             board[position.row][position.column] = 'X';
             displayBoard(board);
+            // send to the server what did the client played
             if (send(sockfd, &answer, sizeof(int), 0) == -1)
                 perror("send");
             if (isFinish(board))
@@ -97,6 +104,7 @@ void play(int sockfd)
             }
             else
             {
+                // draw, all square are used
                 if (counter == 8)
                 {
                     if (recv(sockfd, drawSentence, 100, 0) == -1)
